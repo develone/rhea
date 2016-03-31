@@ -7,7 +7,9 @@ from __future__ import print_function
 
 from argparse import Namespace
 
-from myhdl import Signal, instance, delay, now, StopSimulation, modbv, always
+import pytest
+from myhdl import (Signal, instance, delay, now, StopSimulation,
+                   modbv, always)
 
 from rhea.cores.fifo import fifo_ramp
 
@@ -16,8 +18,10 @@ from rhea.system import Wishbone
 from rhea.system import FIFOBus
 
 from rhea.utils.test import run_testbench, tb_args
+from rhea.utils.test import skip_long_sim_test
 
 
+@skip_long_sim_test
 def test_fifo_ramp():
     tb_fifo_ramp(Namespace(trace=False))
 
@@ -32,7 +36,7 @@ def tb_fifo_ramp(args):
 
     def _bench_fifo_ramp():
         tbdut = fifo_ramp(clock, reset, regbus, fifobus,
-                           base_address=0x0000)
+                          base_address=0x0000)
         tbrbor = regbus.interconnect()
         tbclk = clock.gen()
         
@@ -86,8 +90,8 @@ def tb_fifo_ramp(args):
 
         @always(clock.posedge)
         def tbmon():
-            if fifobus.wr:
-                assert _cval == fifobus.wdata
+            if fifobus.write:
+                assert _cval == fifobus.write_data
                 _cval.next = _cval+1
 
         return tbclk, tbdut, tbstim, tbmon, tbrbor

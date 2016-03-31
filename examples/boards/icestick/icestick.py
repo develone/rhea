@@ -19,19 +19,18 @@ def icestick(clock, led, pmod, uart_tx, uart_rx):
     gticks = glbl_timer_ticks(glbl, include_seconds=True)
 
     # get interfaces to the UART fifos
-    fbustx = FIFOBus(width=8, size=8)
-    fbusrx = FIFOBus(width=8, size=8)
+    fbusrtx = FIFOBus(width=8, size=8)
 
     # get the UART comm from PC
-    guart = uartlite(glbl, fbustx, fbusrx, uart_tx, uart_rx)
+    guart = uartlite(glbl, fbusrtx, uart_tx, uart_rx)
 
     @always_comb
     def beh_loopback():
-        fbusrx.rd.next = not fbusrx.empty
-        fbustx.wr.next = not fbusrx.empty
-        fbustx.wdata.next = fbusrx.rdata
+        fbusrtx.write_data.next = fbusrtx.read_data
+        fbusrtx.write.next = (not fbusrtx.full) & fbusrtx.read
 
     lcnt = Signal(modbv(0, min=0, max=4))
+
     @always(clock.posedge)
     def beh_led_count():
         if glbl.tick_sec:

@@ -3,28 +3,22 @@ from __future__ import print_function
 
 from argparse import Namespace
 
-import pytest
 
-from myhdl import (Signal, intbv, instance, now, StopSimulation,
-                   traceSignals, Simulation)
+# a video display model to check timing
+import pytest
+from myhdl import Signal, intbv, instance, delay, StopSimulation, now
 
 from rhea.system import Clock, Reset, Global
 from rhea.cores.video.lcd import LT24Interface
-
-# a video display model to check timing
-from myhdl import (Signal, intbv, instance, delay,
-                   traceSignals, Simulation)
-
-from rhea.system import Clock, Reset, Global
-
-# @todo: add LT24 display model
 from rhea.models.video import LT24LCDDisplay
 from rhea.utils.test import run_testbench, tb_args
+from rhea.utils.test import skip_long_sim_test
 
 from mm_lt24lcdsys import mm_lt24lcdsys
 from mm_lt24lcdsys import convert
 
 
+@skip_long_sim_test
 def test_lt24lcd():
     args = Namespace()
     tb_lt24lcd(args=args)
@@ -52,7 +46,7 @@ def tb_lt24lcd(args=None):
                lcd_rdn, lcd_data)
     mvd = LT24LCDDisplay()
 
-    def _bench_lt24lcdsys():
+    def bench_lt24lcdsys():
         tbdut = mm_lt24lcdsys(clock, reset, lcd_on, lcd_resetn, 
                               lcd_csn, lcd_rs, lcd_wrn, lcd_rdn, 
                               lcd_data)
@@ -74,9 +68,10 @@ def tb_lt24lcd(args=None):
 
         return tbdut, tbvd, tbclk, tbstim
 
-    run_testbench(_bench_lt24lcdsys)
+    run_testbench(bench_lt24lcdsys)
 
 
+@skip_long_sim_test
 def test_conversion():
     convert()
 

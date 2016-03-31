@@ -1,6 +1,5 @@
 
-from myhdl import (Signal, intbv, always, instance, delay, 
-                   StopSimulation, traceSignals, Simulation)
+from myhdl import (Signal, intbv, instance, delay, StopSimulation)
 
 from rhea.cores.converters import adc128s022
 from rhea.cores.spi import SPIBus
@@ -31,9 +30,10 @@ def test_adc128s022():
                 break
             yield clock.posedge
             
-    def _bench_adc128s022():
+    def bench_adc128s022():
         tbdut = adc128s022(glbl, fifobus, spibus, channel)
-        tbmdl = adc128s022_model(spibus, analog_channels, vref_pos=3.3, vref_neg=0.)
+        tbmdl = adc128s022_model(spibus, analog_channels,
+                                 vref_pos=3.3, vref_neg=0.)
         tbclk = clock.gen()
 
         @instance
@@ -49,10 +49,10 @@ def test_adc128s022():
                 yield check_empty(clock, fifobus)
                 # should have a new sample
                 if not fifobus.empty:
-                    fifobus.rd.next = True
-                    sample[:] = fifobus.rdata
+                    fifobus.read.next = True
+                    sample[:] = fifobus.read_data
                     yield clock.posedge
-                    fifobus.rd.next = False
+                    fifobus.read.next = False
                     yield clock.posedge
                     print("sample {:1X}:{:4d}, fifobus {} \n".format(
                         int(sample[16:12]), int(sample[12:0]), str(fifobus)))
@@ -65,7 +65,7 @@ def test_adc128s022():
             
         return tbdut, tbmdl, tbclk, tbstim
 
-    run_testbench(_bench_adc128s022)
+    run_testbench(bench_adc128s022)
         
         
 if __name__ == '__main__':

@@ -12,7 +12,6 @@ from argparse import Namespace
 import time 
 
 import pytest
-
 from myhdl import *
 
 import rhea
@@ -25,12 +24,14 @@ from rhea.cores.video import VGA
 from rhea.models.video import VGADisplay
 
 from rhea.utils.test import run_testbench
+from rhea.utils.test import skip_long_sim_test
 
 # local wrapper to build a VGA system
 from mm_vgasys import mm_vgasys
 from mm_vgasys import convert
 
 
+@skip_long_sim_test
 def test_vgasys():
     args = Namespace(resolution=(80, 60), 
                      color_depth=(10, 10, 10),
@@ -61,7 +62,7 @@ def tb_vgasys(args=None):
     # intergace to the VGA driver and emulated display 
     vga = VGA(color_depth=color_depth)
 
-    def _bench_vgasys():
+    def bench_vgasys():
         # top-level VGA system 
         tbdut = mm_vgasys(clock, reset, vselect, 
                           vga.hsync, vga.vsync, 
@@ -108,9 +109,10 @@ def tb_vgasys(args=None):
         return tbclk, tbvd, tbstim, tbdut
 
     # run the verification simulation
-    run_testbench(_bench_vgasys)
+    run_testbench(bench_vgasys)
 
 
+@skip_long_sim_test
 def test_vgasys_conversion():
     convert()
 

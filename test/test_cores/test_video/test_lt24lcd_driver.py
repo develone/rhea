@@ -3,17 +3,20 @@ from __future__ import absolute_import
 
 from random import randint
 
+import pytest
 # @todo: fix, only import what is needed
 from myhdl import *
 
 from rhea.system import Global, Clock, Reset
 from rhea.cores.video.lcd import LT24Interface
-from rhea.cores.video.lcd._lt24lcd_driver import lt24lcd_driver
+from rhea.cores.video.lcd.lt24lcd_driver import lt24lcd_driver
 from rhea.models.video import LT24LCDDisplay
 from rhea.cores.misc import glbl_timer_ticks
 from rhea.utils.test import run_testbench
+from rhea.utils.test import skip_long_sim_test
 
 
+@skip_long_sim_test
 def test_lt24lcd_driver():
     tb_lt24lcd_driver()
 

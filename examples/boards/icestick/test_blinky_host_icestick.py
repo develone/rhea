@@ -10,7 +10,7 @@ from rhea.utils.test import run_testbench, tb_args, tb_default_args
 from rhea.utils import CommandPacket
 from rhea.utils.command_packet import PACKET_LENGTH
 
-from blinky_host import icestick_blinky_host
+from icestick_blinky_host import icestick_blinky_host
 
 
 def test_ibh(args=None):
